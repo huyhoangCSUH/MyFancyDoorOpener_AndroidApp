@@ -63,6 +63,15 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        final Button ResetButton = (Button) findViewById(R.id.reset);
+        Authorization.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                // Create Object and call AsyncTask execute Method
+                new ResetAuth().execute();
+
+            }
+        });
     }
 
     private class SetAuth  extends AsyncTask<String, Void, Void> {
@@ -78,6 +87,56 @@ public class MainActivity extends AppCompatActivity {
             try {
                 //Create a URL object holding our url
                 URL url = new URL("http://huyhoang.io:8000/setauth");
+                //Create a connection
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                //Set methods and timeouts
+                urlConnection.setRequestMethod(REQUEST_METHOD);
+                urlConnection.setReadTimeout(READ_TIMEOUT);
+                urlConnection.setConnectTimeout(CONNECTION_TIMEOUT);
+
+                urlConnection.connect();
+
+                //Create a new InputStreamReader
+                InputStreamReader streamReader = new InputStreamReader(urlConnection.getInputStream());
+                //Create a new buffered reader and String Builder
+                BufferedReader reader = new BufferedReader(streamReader);
+                StringBuilder stringBuilder = new StringBuilder();
+                //Check if the line we are reading is not null
+                while((inputLine = reader.readLine()) != null){
+                    stringBuilder.append(inputLine);
+                }
+
+                //Close our InputStream and Buffered reader
+                reader.close();
+                streamReader.close();
+                //Set our result equal to our stringBuilder
+                result = stringBuilder.toString();
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        protected void onPostExecute() {
+
+        }
+    }
+
+    private class ResetAuth  extends AsyncTask<String, Void, Void> {
+        String result;
+        String inputLine;
+
+        protected void onPreExecute() {
+
+        }
+
+        protected Void doInBackground(String... urls) {
+
+            try {
+                //Create a URL object holding our url
+                URL url = new URL("http://huyhoang.io:8000/resetauth");
                 //Create a connection
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 //Set methods and timeouts
