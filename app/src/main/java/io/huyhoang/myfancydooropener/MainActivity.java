@@ -17,9 +17,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import android.graphics.Color;
 import java.io.OutputStream;
+import java.io.BufferedOutputStream;
 import java.io.InputStream;
+import java.io.DataOutputStream;
 import java.net.HttpURLConnection;
 import android.graphics.BitmapFactory;
+
 
 import java.lang.Boolean.*;
 
@@ -63,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class SetAuth  extends AsyncTask<String, Void, Void> {
+        String result;
+        String inputLine;
 
         protected void onPreExecute() {
 
@@ -76,11 +81,27 @@ public class MainActivity extends AppCompatActivity {
                 //Create a connection
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 //Set methods and timeouts
-                urlConnection.setRequestMethod("POST");
+                urlConnection.setRequestMethod(REQUEST_METHOD);
                 urlConnection.setReadTimeout(READ_TIMEOUT);
                 urlConnection.setConnectTimeout(CONNECTION_TIMEOUT);
 
                 urlConnection.connect();
+
+                //Create a new InputStreamReader
+                InputStreamReader streamReader = new InputStreamReader(urlConnection.getInputStream());
+                //Create a new buffered reader and String Builder
+                BufferedReader reader = new BufferedReader(streamReader);
+                StringBuilder stringBuilder = new StringBuilder();
+                //Check if the line we are reading is not null
+                while((inputLine = reader.readLine()) != null){
+                    stringBuilder.append(inputLine);
+                }
+
+                //Close our InputStream and Buffered reader
+                reader.close();
+                streamReader.close();
+                //Set our result equal to our stringBuilder
+                result = stringBuilder.toString();
             }
             catch(Exception e){
                 e.printStackTrace();
@@ -93,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
 
     private class RetrieveName  extends AsyncTask<String, Void, String> {
 
